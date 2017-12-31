@@ -1,0 +1,101 @@
+---
+title: "project4"
+author: "Brendon Happ"
+date: "December 30, 2017"
+output: html_document
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(knitr)
+library(gridExtra)
+stroopdata <- read.csv("stroopdata.csv")
+```
+
+# Statistics: The Science of Decisions 
+
+## 1. What is our independent variable? What is our dependent variable?
+The independent variable is controlled so it would be the congruent word 
+condition.
+
+The dependent changes with changes to the independent variable, so that would be
+the time.
+
+## 2. What is an appropriate set of hypotheses for this task? What kind of statistical test do you expect to perform? Justify your choices. 
+
+The goal is to see if it takes more time on average to read incongruent words or 
+not. This can be described with the following hypotheses:
+
+Null Hypothesis ($H_o$):
+There is no statistically significant difference in time from reading congruent
+and incongruent words.
+
+$H_o$ : $\mu_{incongruent}$ = $\mu_{congruent}$
+
+Alternate Hypothesis ($H_A$):
+There is a statistically significant difference in time from reading congruent
+and incongruent words.
+
+$H_A$ : $\mu_{incongruent}$ > $\mu_{congruent}$
+
+  Where:
+  
+    $\mu_{incongruent}$ = Average of time taken to read incongruent words
+    $\mu_{congruent}$ = Average of time taken to read congruent words
+
+From the data, we do not have the population standard deviation $\sigma$ and 
+there are under 30 datasets. We also know that both of the tests were given to
+the same people. Since the goal is to see if it took more time or not to read 
+incongurent words, a one tailed dependent sample t test will be used.
+
+## 3. Report some descriptive statistics regarding this dataset. Include at least one measure of central tendency and at least one measure of variability.
+
+```{r, message=FALSE, warning=FALSE}
+congruent.mean <- mean(stroopdata$Congruent) #14.051125
+incongruent.mean <- mean(stroopdata$Incongruent) #22.015917
+congruent.sd <- sd(stroopdata$Congruent) #3.559
+incongruent.sd <- sd(stroopdata$Incongruent) #4.797
+```
+The average time to complete the task for congruent words was 14.05 seconds. The
+average time for incongruent words is 22.016 seconds. The incongruent words 
+varied more with a standard deviation of 4.797 versus 3.559 for congruent words.
+
+## 4. Provide one or two visualizations that show the distribution of the sample data. Write one or two sentences noting what you observe about the plot or plots.
+
+```{r, message=FALSE, warning=FALSE}
+plot1 <- ggplot(stroopdata, aes(Congruent)) +geom_histogram(fill = 'red', 
+                                                   color = 'white',
+                                                   binwidth = 2.5)
+
+plot2 <- ggplot(stroopdata, aes(Incongruent)) + geom_histogram(fill = 'green', 
+                                                   color = 'white',
+                                                   binwidth = 3.5)
+grid.arrange(plot1, plot2)
+```
+
+The histograms above show that the data is normally distributed. They also show 
+that the Incongruent words generally take a longer time than the Congruent words
+
+## 5. Now, perform the statistical test and report your results. What is your confidence level and your critical statistic value? Do you reject the null hypothesis or fail to reject it? Come to a conclusion in terms of the experiment task. Did the results match up with your expectations?
+
+```{r, message=FALSE, warning=FALSE}
+n <- dim(stroopdata)[1] #24
+alpha = .05
+mean.diff <- incongruent.mean - congruent.mean #7.96479
+SE <- sd(stroopdata$Incongruent - stroopdata$Congruent)/sqrt(n) #.993029
+t <- mean.diff/SE #8.0207
+t.crit <- qt(1-alpha, df = n-1) #1.71387
+p <- pt(-abs(t), df = n-1) #2.5e^-8
+con.low = mean.diff-(t.crit*SE) #6.26
+con.high = mean.diff+(t.crit*SE) #9.67
+```
+
+These statistical results tell us that we will reject the null. The t critical 
+value (1.71387) is smaller than the t statistic value (8.0207) at an $\alpha$ of 
+.05. The p value (2.5e6-8) is also much smaller than $\alpha$, therefor we 
+reject the null. This means we accept the alternative hypothesis and
+$H_A$ : $\mu_{incongruent}$ > $\mu_{congruent}$, is true. The time it takes 
+on average to read incongruent words is more than it would take for congruent
+words.
+The confidence interval on the mean difference is: 95% CI = (6.26, 9.67)
+
